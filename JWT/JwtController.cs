@@ -14,33 +14,36 @@ using Microsoft.Extensions.Configuration;
 
 namespace ICT_Operator_App.JWT
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class JwtController : ControllerBase
-    {
-    private IConfiguration _config;
-    private MusicCatalogDbContext _context;
+	[Route("api/[controller]")]
+	[ApiController]
+	public class JwtController : ControllerBase
+	{
+		private IConfiguration _config;
+		private MusicCatalogDbContext _context;
 
-    public JwtController(IConfiguration config, MusicCatalogDbContext context) {
-      _config = config;
-      _context = context;
-    }
+		public JwtController(IConfiguration config, MusicCatalogDbContext context)
+		{
+			_config = config;
+			_context = context;
+		}
 
-    [HttpGet]
-    public string UserLogin(string email, string password) {
-      var jwt = new JwtService(_config);
-      var token = jwt.GenerateSecurityToken(email);
+		[HttpGet]
+		public string UserLogin(string email, string password)
+		{
+			var jwt = new JwtService(_config);
+			var token = jwt.GenerateSecurityToken(email);
 
-      return CanBeLoggedIn(email, password) ? token : "";
-    }
+			return CanBeLoggedIn(email, password) ? token : "";
+		}
 
-    private bool CanBeLoggedIn(string email, string password) {
-      LocalUser lc = _context.LocalUsers.ToArrayAsync().Result.First(u => u.Username.Equals(email, StringComparison.OrdinalIgnoreCase));
-      var stringToSecure = new StringBuilder(password).Append(lc.Salt).ToString();
-      byte[] bytesToSecure = Convert.FromBase64String(stringToSecure);
-      var securedPassword = Convert.ToBase64String(SHA512.Create().ComputeHash(bytesToSecure));
+		private bool CanBeLoggedIn(string email, string password)
+		{
+			LocalUser lc = _context.LocalUsers.ToArrayAsync().Result.First(u => u.Username.Equals(email, StringComparison.OrdinalIgnoreCase));
+			var stringToSecure = new StringBuilder(password).Append(lc.Salt).ToString();
+			byte [] bytesToSecure = Convert.FromBase64String(stringToSecure);
+			var securedPassword = Convert.ToBase64String(SHA512.Create().ComputeHash(bytesToSecure));
 
-      return securedPassword.Equals(lc.HashedPassword);
-    }
-  }
+			return securedPassword.Equals(lc.HashedPassword);
+		}
+	}
 }

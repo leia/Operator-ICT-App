@@ -8,30 +8,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ICT_Operator_App.JWT {
-  public static class AuthenticationExtension {
-    public static IServiceCollection AddTokenAuthentication(this IServiceCollection services, IConfiguration config) {
-      var secret = config.GetSection("JwtConfig").GetSection("secret").Value;
+namespace ICT_Operator_App.JWT
+{
+	public static class AuthenticationExtension
+	{
+		public static IServiceCollection AddTokenAuthentication(this IServiceCollection services, IConfiguration config)
+		{
+			var secret = config.GetSection("JwtConfig").GetSection("secret").Value;
 
-      var key = Encoding.ASCII.GetBytes(secret);
+			var key = Encoding.ASCII.GetBytes(secret);
 
-      services.AddAuthentication(x =>
-      {
-        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-      })
-      .AddJwtBearer(x => {
-        x.RequireHttpsMetadata = false;
-        x.SaveToken = true;
-        x.TokenValidationParameters = new TokenValidationParameters {
-          ValidateIssuerSigningKey = true,
-          IssuerSigningKey = new SymmetricSecurityKey(key),
-          ValidateIssuer = false,
-          ValidateAudience = false
-        };
-      });
+			services.AddAuthentication(x => {
+				x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+				x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+			})
+			.AddJwtBearer(x => {
+				x.RequireHttpsMetadata = false;
+				x.SaveToken = true;
+				x.TokenValidationParameters = new TokenValidationParameters {
+					ValidateIssuerSigningKey = true,
+					IssuerSigningKey = new SymmetricSecurityKey(key),
+					ValidateIssuer = false,
+					ValidateAudience = false
+				};
+			});
 
-      return services;
-    }
-  }
+			return services;
+		}
+	}
 }
